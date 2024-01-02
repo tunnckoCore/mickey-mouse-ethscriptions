@@ -24,7 +24,7 @@ const collectionMetadata = {
   banner_image_uri: "",
   background_color: "#001",
   twitter_link: "",
-  website_link: "https://mickey-mouse.vercel.app",
+  website_link: "https://mickey-mouse-ethscriptions.vercel.app",
   discord_link: "",
   collection_items: [],
 };
@@ -79,9 +79,9 @@ export async function GET() {
       return {
         sha: webpSha,
         name: `Mickey Mouse ${id}`,
-        description: `Ethscriptions Mickey Mouse #${id}. January 2, 2024. Minted on https://mickey-mouse.vercel.app`,
+        description: `Ethscriptions Mickey Mouse #${id}. January 2, 2024. Minted on https://mickey-mouse-ethscriptions.vercel.app`,
         item_attributes: attributes,
-        external_url: `https://mickey-mouse.vercel.app/png/${id}.png`,
+        external_url: `https://mickey-mouse-ethscriptions.vercel.app/png/${id}.png`,
         ethscription_id: ethscription ? ethscription.transaction_hash : "",
       };
     },
@@ -101,8 +101,6 @@ export async function GET() {
 
   return new Response(JSON.stringify(collectionMetadata), {
     status: 200,
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
   });
 }

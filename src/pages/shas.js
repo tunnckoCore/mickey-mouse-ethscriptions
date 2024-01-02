@@ -1,6 +1,5 @@
 import fs from "node:fs/promises";
 import pMap from "p-map";
-// import { encode as arrayBufferToBase64 } from "base64-arraybuffer";
 
 async function sha256(msg, algo) {
   const hashBuffer = await crypto.subtle.digest(
@@ -26,12 +25,6 @@ export async function GET() {
     const imageBase64 = await fs.readFile(filepath, { encoding: "base64" });
     const sha = await sha256(`data:image/webp;base64,${imageBase64}`);
 
-    if (
-      sha === "207aecd0174ffe29dbbddc85603019faf2672a36ed0cf53ceb029002551dcba7"
-    ) {
-      console.log("id", id);
-    }
-    // 207aecd0174ffe29dbbddc85603019faf2672a36ed0cf53ceb029002551dcba7
     return { id: Number(id), sha };
   });
 
@@ -40,8 +33,6 @@ export async function GET() {
 
   return new Response(JSON.stringify(shas), {
     status: 200,
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
   });
 }

@@ -8,25 +8,6 @@ const { origin } = new URL(Astro.request.url);
 const rndIndex = Math.floor(Math.random() * 1928) + 1;
 const img = await fetch(`${origin}/webp/${rndIndex}.webp`);
 
-// async function sha256(msg, algo) {
-//   const hashBuffer = await crypto.subtle.digest(
-//     algo || "SHA-256",
-//     typeof msg === "string" ? new TextEncoder().encode(msg) : msg,
-//   );
-
-//   return toHex(hashBuffer);
-// }
-
-// function toHex(x) {
-//   const buf = typeof x === "string" ? new TextEncoder().encode(x) : x;
-//   const hashArray = Array.from(buf);
-//   const hashHex = hashArray
-//     .map((b) => b.toString(16).padStart(2, "0"))
-//     .join("");
-
-//   return hashHex;
-// }
-
 const imgBase64 = arrayBufferToBase64(await img.arrayBuffer());
 const imgDataURL = `data:image/webp;base64,${imgBase64}`;
 ---

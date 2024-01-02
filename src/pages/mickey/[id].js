@@ -41,8 +41,8 @@ export async function GET({ params, ...rest }) {
     const json = {
       name: `Mickey Mouse #${params.id}`,
       attributes,
-      description: `Ethscriptions Mickey Mouse #${params.id}. January 2, 2024. Minted on https://mickey-mouse.vercel.app`,
-      external_url: `https://mickey-mouse.vercel.app/png/${params.id}.png`,
+      description: `Ethscriptions Mickey Mouse #${params.id}. January 2, 2024. Minted on https://mickey-mouse-ethscriptions.vercel.app`,
+      external_url: `https://mickey-mouse-ethscriptions.vercel.app/png/${params.id}.png`,
     };
 
     return new Response(JSON.stringify(json), {
