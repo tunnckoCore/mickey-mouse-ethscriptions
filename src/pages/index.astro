@@ -1,0 +1,57 @@
+---
+import "../global.css";
+import Mint from "../islands/mint";
+import { encode as arrayBufferToBase64 } from "base64-arraybuffer";
+// import { Content } from "../homepage.mdx";
+
+const { origin } = new URL(Astro.request.url);
+const rndIndex = Math.floor(Math.random() * 1928) + 1;
+const img = await fetch(`${origin}/webp/${rndIndex}.webp`);
+
+// async function sha256(msg, algo) {
+//   const hashBuffer = await crypto.subtle.digest(
+//     algo || "SHA-256",
+//     typeof msg === "string" ? new TextEncoder().encode(msg) : msg,
+//   );
+
+//   return toHex(hashBuffer);
+// }
+
+// function toHex(x) {
+//   const buf = typeof x === "string" ? new TextEncoder().encode(x) : x;
+//   const hashArray = Array.from(buf);
+//   const hashHex = hashArray
+//     .map((b) => b.toString(16).padStart(2, "0"))
+//     .join("");
+
+//   return hashHex;
+// }
+
+const imgBase64 = arrayBufferToBase64(await img.arrayBuffer());
+const imgDataURL = `data:image/webp;base64,${imgBase64}`;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Mickey Mouse Ethscriptions - Public Domain</title>
+  </head>
+  <body class="bg-slate-950 px-4 text-slate-100 sm:px-0">
+    <div class="mx-auto flex max-w-xl flex-col items-center justify-center">
+      <section class="mt-8 flex flex-col items-center justify-center gap-4">
+        <h1 class="text-5xl font-extrabold">Mickey Mouse</h1>
+        <div class="text-center">
+          The House of Mickey went to Public Domain, so we are minting it on
+          <span class="font-bold">Ethscriptions</span> as 64x64 webp images, 900b
+          size, for free. <span class="font-bold">Supply 1928</span>.
+        </div>
+        <div class="flex flex-col gap-4">
+          <Mint client:load {imgDataURL} id={rndIndex} />
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
