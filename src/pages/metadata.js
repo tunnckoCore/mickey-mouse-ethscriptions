@@ -1,6 +1,10 @@
-import fs from "node:fs/promises";
+// import fs from "node:fs/promises";
 import pMap from "p-map";
-// import { encode as arrayBufferToBase64 } from "base64-arraybuffer";
+import { encode as arrayBufferToBase64 } from "base64-arraybuffer";
+
+const ids = Array.from({ length: 1928 })
+  .fill(0)
+  .map((_, i) => i + 1);
 
 async function sha256(msg, algo) {
   const hashBuffer = await crypto.subtle.digest(
@@ -56,48 +60,45 @@ async function getEthscription(sha) {
 }
 
 export async function GET() {
-  const files = (await fs.readdir("./public/json")).map((x) => ({
-    filepath: `./public/json/${x}`,
-    id: x.split(".")[0],
-  }));
+  const collection_items = await pMap(
+    ids,
+    async (id) => {
+      const imgBuf = await fetch(
+        `https://raw.githubusercontent.com/tunnckoCore/mickey-mouse-ethscriptions/master/public/webp/${id}.webp`,
+      ).then((x) => x.arrayBuffer());
 
-  collectionMetadata.collection_items = await pMap(
-    files,
-    async ({ filepath, id }) => {
-      const content = await fs.readFile(filepath, "utf-8");
-      const imageBase64 = await fs.readFile(`./public/webp/${id}.webp`, {
-        encoding: "base64",
-      });
+      const imageBase64 = arrayBufferToBase64(imgBuf);
+      const sha = await sha256(`data:image/webp;base64,${imageBase64}`);
 
-      const { attributes } = JSON.parse(content);
+      const { attributes } = await fetch(
+        `https://raw.githubusercontent.com/tunnckoCore/mickey-mouse-ethscriptions/master/public/json/${id}.json`,
+      ).then((x) => x.json());
 
-      const webpSha = await sha256(`data:image/webp;base64,${imageBase64}`);
-      const ethscription = await getEthscription(webpSha);
+      const ethscription = await getEthscription(sha);
 
-      attributes.push({ trait_type: "SHA-256", value: webpSha });
+      attributes.push({ trait_type: "SHA-256", value: sha });
 
       return {
-        sha: webpSha,
-        name: `Mickey Mouse ${id}`,
+        sha,
+        name: `Mickey Mouse #${id}`,
         description: `Ethscriptions Mickey Mouse #${id}. January 2, 2024. Minted on https://mickey-mouse-ethscriptions.vercel.app`,
         item_attributes: attributes,
         external_url: `https://mickey-mouse-ethscriptions.vercel.app/png/${id}.png`,
         ethscription_id: ethscription ? ethscription.transaction_hash : "",
       };
     },
+    { concurrency: 100 },
   );
 
-  // collectionMetadata.minted = collectionMetadata.collection_items.filter(
-  //   (x) => x.item_attributes.find((y) => y.trait_type === "SHA-256" && ),
+  // const minted_items = collectionMetadata.collection_items.filter(
+  //   (x) => x.ethscription_id !== "",
   // );
 
-  collectionMetadata.minted_items = collectionMetadata.collection_items.filter(
+  collectionMetadata.minted_count = collection_items.filter(
     (x) => x.ethscription_id !== "",
-  );
-  collectionMetadata.minted_count = collectionMetadata.minted_items.length;
-
-  // metadata.collection_items = await fs.readdir("./public/metadata");
-  // metadata.collection_items = metadata.collection_items.map();
+  ).length;
+  // collectionMetadata.minted_items = minted_items;
+  collectionMetadata.collection_items = collection_items;
 
   return new Response(JSON.stringify(collectionMetadata), {
     status: 200,

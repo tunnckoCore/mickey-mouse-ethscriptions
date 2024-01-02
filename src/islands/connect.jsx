@@ -30,7 +30,7 @@ async function sha256(msg, algo) {
   return hashHex;
 }
 
-export default function ConnectButton({ imgDataURL, id }) {
+export default function ConnectButton({ imgDataURL, id, ethscription }) {
   const { open } = useWeb3Modal();
   const { address } = useAccount();
 
@@ -76,7 +76,7 @@ export default function ConnectButton({ imgDataURL, id }) {
       <button
         className={
           `rounded-md px-2 py-1.5 font-semibold` +
-          (address ? " bg-green-500" : " bg-blue-500")
+          (address ? " bg-purple-500" : " bg-blue-500")
         }
         onClick={() => open()}
       >
@@ -86,14 +86,26 @@ export default function ConnectButton({ imgDataURL, id }) {
         <div>Connect and click the image to mint it.</div>
         <div className="font-bold">Mickey #{id}</div>
       </div>
-      <div className="flex w-full items-center justify-center">
+
+      <div className="flex w-full items-center justify-center border-4 border-red-500">
         <img
-          className="h-96 w-full cursor-pointer"
+          className={
+            `h-96 w-full` +
+            (ethscription.result
+              ? "cursor-not-allowed opacity-25"
+              : "cursor-pointer")
+          }
           src={`/mickey/${id}?format=png`}
           alt="Mickey Mouse"
-          onClick={mintImage}
+          onClick={ethscription.result ? () => {} : mintImage}
         />
       </div>
+      <button
+        className="rounded-md bg-green-500 px-2 py-1.5 font-semibold"
+        onClick={ethscription.result ? () => {} : mintImage}
+      >
+        Mint
+      </button>
       <button
         className="rounded-md bg-orange-500 px-2 py-1.5 font-semibold"
         onClick={() => window.location.reload()}

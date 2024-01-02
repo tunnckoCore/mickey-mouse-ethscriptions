@@ -4,12 +4,61 @@ import Mint from "../islands/mint";
 import { encode as arrayBufferToBase64 } from "base64-arraybuffer";
 // import { Content } from "../homepage.mdx";
 
+async function getEthscription(sha) {
+  let res = null;
+
+  try {
+    res = await fetch(
+      `https://api.ethscriptions.com/api/ethscriptions/exists/${sha}`,
+    );
+    if (!res.ok) {
+      throw new Error("Error fetching api.");
+    }
+
+    res = await res.json();
+  } catch (e) {
+    // alert("Error checking the Ethscriptions API!");
+    return 0;
+  }
+
+  if (res.result) {
+    // alert("This image has already been minted, page will reload!");
+    // window.location.reload();
+    return res;
+  }
+
+  return null;
+}
+
+async function sha256(msg, algo = null) {
+  const hashBuffer = await crypto.subtle.digest(
+    algo || "SHA-256",
+    typeof msg === "string" ? new TextEncoder().encode(msg) : msg,
+  );
+
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+
+  return hashHex;
+}
+
 const { origin } = new URL(Astro.request.url);
 const rndIndex = Math.floor(Math.random() * 1928) + 1;
 const img = await fetch(`${origin}/webp/${rndIndex}.webp`);
 
 const imgBase64 = arrayBufferToBase64(await img.arrayBuffer());
 const imgDataURL = `data:image/webp;base64,${imgBase64}`;
+
+const sha = await sha256(imgDataURL);
+
+const ethscription = await getEthscription(sha);
+
+// if (ethscription.result && Astro.request.method === "GET") {
+//   const origin = new URL(Astro.request.url).origin;
+//   return Astro.redirect(origin);
+// }
 ---
 
 <html lang="en">
@@ -30,7 +79,12 @@ const imgDataURL = `data:image/webp;base64,${imgBase64}`;
           size, for free. <span class="font-bold">Supply 1928</span>.
         </div>
         <div class="flex flex-col gap-4">
-          <Mint client:load {imgDataURL} id={rndIndex} />
+          <Mint
+            client:load
+            {imgDataURL}
+            id={rndIndex}
+            ethscription={ethscription}
+          />
         </div>
       </section>
     </div>
