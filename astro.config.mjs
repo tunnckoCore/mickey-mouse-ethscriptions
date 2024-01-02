@@ -9,5 +9,7 @@ import vercel from "@astrojs/vercel/serverless";
 export default defineConfig({
   output: "server",
   integrations: [tailwind(), mdx(), react()],
-  adapter: vercel(),
+  adapter: vercel({
+    // includeFiles: ["src/pages/mickey/metadata.json"],
+  }),
 });
