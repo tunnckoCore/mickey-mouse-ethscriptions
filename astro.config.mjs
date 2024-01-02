@@ -9,7 +9,5 @@ import node from "@astrojs/node";
 export default defineConfig({
   output: "server",
   integrations: [tailwind(), mdx(), react()],
-  adapter: node({
-    mode: "standalone"
-  })
+  adapter: node(),
 });
